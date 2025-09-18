@@ -1,0 +1,17 @@
+.env
+config.ini
+
+*.log
+*.cache
+*.tmp
+
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+*.bak
+*.swp

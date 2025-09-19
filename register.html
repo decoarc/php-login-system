@@ -11,11 +11,28 @@
       <input type="email" name="email" placeholder="E-mail" required /><br />
       <input
         type="password"
+        id="pass"
         name="pass"
         placeholder="Password"
         required
-      /><br />
+      />
+      <button type="button" id="togglePass" name="togglePass">👁️</button><br />
       <button type="submit">Register</button>
     </form>
   </body>
 </html>
+
+<script>
+  const passInput = document.getElementById("pass");
+  const togglePass = document.getElementById("togglePass");
+
+  togglePass.addEventListener("click", () => {
+    if (passInput.type === "password") {
+      passInput.type = "text";
+      togglePass.textContent = "🙈";
+    } else {
+      passInput.type = "password";
+      togglePass.textContent = "👁️";
+    }
+  });
+</script>

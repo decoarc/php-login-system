@@ -6,9 +6,16 @@
   </head>
   <body>
     <h2>Register</h2>
-    <form action="register.php" method="post">
+    <form action="register.php" id="registerForm" method="post">
       <input type="text" name="user" placeholder="User" required /><br />
-      <input type="email" name="email" placeholder="E-mail" required /><br />
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="E-mail"
+        required
+      />
+      <span id="emailMsg"></span><br />
       <input
         type="password"
         id="pass"
@@ -20,19 +27,69 @@
       <button type="submit">Register</button>
     </form>
   </body>
+
+  <script>
+    const passInput = document.getElementById("pass");
+    const togglePass = document.getElementById("togglePass");
+
+    togglePass.addEventListener("click", () => {
+      if (passInput.type === "password") {
+        passInput.type = "text";
+        togglePass.textContent = "🙈";
+      } else {
+        passInput.type = "password";
+        togglePass.textContent = "👁️";
+      }
+    });
+
+    document.getElementById("email").addEventListener("blur", function () {
+      let email = this.value;
+      let msgSpan = document.getElementById("emailMsg");
+
+      if (email.length === 0) {
+        msgSpan.textContent = "";
+        return;
+      }
+
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "check_email.php", true);
+      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          if (xhr.responseText.trim() === "exists") {
+            msgSpan.textContent = " Este email já está em uso.";
+            msgSpan.style.color = "red";
+          } else if (xhr.responseText.trim() === "ok") {
+            msgSpan.textContent = " Email disponível.";
+            msgSpan.style.color = "green";
+          } else {
+            msgSpan.textContent = "";
+          }
+        }
+      };
+
+      xhr.send("email=" + encodeURIComponent(email));
+    });
+
+    document
+      .getElementById("registerForm")
+      .addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let formData = new FormData(this);
+
+        fetch("register.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            let msg = document.getElementById("formMsg");
+            msg.textContent = data.message;
+            msg.style.color = data.status === "success" ? "green" : "red";
+          })
+          .catch((error) => console.error("Erro:", error));
+      });
+  </script>
 </html>
-
-<script>
-  const passInput = document.getElementById("pass");
-  const togglePass = document.getElementById("togglePass");
-
-  togglePass.addEventListener("click", () => {
-    if (passInput.type === "password") {
-      passInput.type = "text";
-      togglePass.textContent = "🙈";
-    } else {
-      passInput.type = "password";
-      togglePass.textContent = "👁️";
-    }
-  });
-</script>

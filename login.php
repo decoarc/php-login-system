@@ -17,7 +17,7 @@ $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if ($result->num_row === 1) {
+if ($result->num_rows === 1) {
     $user = $result->fetch_assoc();
 
     if(password_verify($pass, $user['pass'])){

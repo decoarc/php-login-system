@@ -17,13 +17,23 @@ $user = $_POST['user'];
 $email = $_POST['email'];
 $pass = password_hash($_POST['pass'], PASSWORD_DEFAULT);
 
-$sql = "INSERT INTO users (user, email, pass) VALUES ('$user','$email', '$pass')";
+$check = $conn->prepare("SELECT id FROM users WHERE email = ?");
+$check->bind_param("s", $email);
+$check->execute();
+$check->store_result();
 
-if ($conn->query($sql) === TRUE){
-    echo "user registered successfully";
-    echo "<br><a href='register.html'>Back</a>";
+if ($check->num_rows > 0){
+    echo json_encode(["status" => "error", "message" => "Este email já está em uso."]);
 } else {
-    echo "Error: " .$conn->error;
+    $sql = $conn->prepare("INSERT INTO users (user, email, pass) VALUES (?, ?, ?)");
+    $sql->bind_param("sss", $user, $email, $pass);
+
+    if ($sql->execute()) {
+        echo json_encode(["status" => "success", "message" => "Usuário registrado com sucesso!"]);
+    } else {
+        echo json_encode(["status" => "error", "message" => "Erro ao registrar usuário: " . $conn->error]);
+    }
+
 }
 
 $conn->close();

@@ -20,9 +20,10 @@ $pass = password_hash($_POST['pass'], PASSWORD_DEFAULT);
 $check = $conn->prepare("SELECT id FROM users WHERE email = ?");
 $check->bind_param("s", $email);
 $check->execute();
+$check->store_result();
 
 if ($check->num_rows > 0){
-    echo json_encode(["status" => "error", "message" => "Este email já está em uso."]);
+    echo json_encode(["status" => "error", "message" => "E-mail not avalible"]);
     $check->close();
 } else {
     $check->close();

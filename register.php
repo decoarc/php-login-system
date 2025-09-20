@@ -10,7 +10,7 @@ $db   = $config['DB_NAME'];
 $conn = new mysqli($host, $user, $pass, $db);
 
 if ($conn->connect_error){
-    die("Connect Error" . $conn->connect_error);
+    die("Connect Error");
 }
 
 $user = $_POST['user'];
@@ -20,18 +20,20 @@ $pass = password_hash($_POST['pass'], PASSWORD_DEFAULT);
 $check = $conn->prepare("SELECT id FROM users WHERE email = ?");
 $check->bind_param("s", $email);
 $check->execute();
-$check->store_result();
 
 if ($check->num_rows > 0){
     echo json_encode(["status" => "error", "message" => "Este email já está em uso."]);
+    $check->close();
 } else {
+    $check->close();
+
     $sql = $conn->prepare("INSERT INTO users (user, email, pass) VALUES (?, ?, ?)");
     $sql->bind_param("sss", $user, $email, $pass);
 
     if ($sql->execute()) {
-        echo json_encode(["status" => "success", "message" => "Usuário registrado com sucesso!"]);
+        echo json_encode(["status" => "success", "message" => "New user successfully registered"]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Erro ao registrar usuário: " . $conn->error]);
+        echo json_encode(["status" => "error", "message" => "User can't be registred"]);
     }
 
 }

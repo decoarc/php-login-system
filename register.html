@@ -25,6 +25,7 @@
       />
       <button type="button" id="togglePass" name="togglePass">👁️</button><br />
       <button type="submit">Register</button>
+      <p id="formMsg"></p>
     </form>
   </body>
 
@@ -58,10 +59,10 @@
       xhr.onload = function () {
         if (xhr.status === 200) {
           if (xhr.responseText.trim() === "exists") {
-            msgSpan.textContent = " Este email já está em uso.";
+            msgSpan.textContent = " E-mail not avalible.";
             msgSpan.style.color = "red";
           } else if (xhr.responseText.trim() === "ok") {
-            msgSpan.textContent = " Email disponível.";
+            msgSpan.textContent = " E-mail avalible.";
             msgSpan.style.color = "green";
           } else {
             msgSpan.textContent = "";

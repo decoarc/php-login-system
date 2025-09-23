@@ -64,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <button type="button" id="togglePass" name="togglePass">👁️</button><br />
       <button type="submit">Register</button>
       <p id="formMsg"></p>
+      <p>want to go back? <a href="login.php">Login</a></p>
     </form>
   </body>
 
@@ -82,32 +83,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     });
 
     document.getElementById("email").addEventListener("blur", function () {
-      let email = this.value;
-      let msgSpan = document.getElementById("emailMsg");
+      const email = this.value;
+      const msgSpan = document.getElementById("emailMsg");
 
       if (email.length === 0) {
         msgSpan.textContent = "";
         return;
       }
 
-      let xhr = new XMLHttpRequest();
-      xhr.open("POST", "", true);
-      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-      xhr.onload = function () {
-        if (xhr.status === 200) {
-          let data = JSON.parse(xhr.responseText);
-          if (data.status === "error" && data.message.includes("E-mail")) {
+      fetch("check_email.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "email=" + encodeURIComponent(email),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === "ok" && data.available === false) {
             msgSpan.textContent = " E-mail not available.";
             msgSpan.style.color = "red";
-          } else {
+          } else if (data.status === "ok" && data.available === true) {
             msgSpan.textContent = " E-mail available.";
             msgSpan.style.color = "green";
+          } else {
+            msgSpan.textContent = " Could not check e-mail.";
+            msgSpan.style.color = "orange";
           }
-        }
-      };
-
-      xhr.send("email=" + encodeURIComponent(email));
+        })
+        .catch(() => {
+          msgSpan.textContent = " Could not check e-mail.";
+          msgSpan.style.color = "orange";
+        });
     });
 
     document
@@ -115,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       .addEventListener("submit", function (e) {
         e.preventDefault();
 
-        let formData = new FormData(this);
+        const formData = new FormData(this);
 
         fetch("", {
           method: "POST",
@@ -123,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         })
           .then((response) => response.json())
           .then((data) => {
-            let msg = document.getElementById("formMsg");
+            const msg = document.getElementById("formMsg");
             msg.textContent = data.message;
             msg.style.color = data.status === "success" ? "green" : "red";
           })

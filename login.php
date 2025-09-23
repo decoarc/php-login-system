@@ -30,14 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $result->fetch_assoc();
 
         if(password_verify($pass, $user['pass'])){
+            session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['user'];
-            $message = "Login successful! Welcome, " . $user['user'] . ". <a href='dashboard.php'>Go to Dashboard</a>";
+            $stmt->close();
+            $conn->close();
+            header('Location: dashboard.php');
+            exit;
         } else{
-            $message = "Wrong password! <a href='login.php'>Go back</a>";
+            $message = "Wrong password!";
         }
     } else{
-        $message = "User not found! <a href='login.php'>Go back</a>";
+        $message = "User not found!";
     }
 
     $stmt->close();
@@ -54,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <body>
     <h2>Login</h2>
     <?php if($message): ?>
-        <p><?php echo $message; ?></p>
+        <p><?php echo htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?> <a href='login.php'>Go back</a></p>
     <?php endif; ?>
     <form method="POST">
       <input type="email" name="email" placeholder="E-mail" required /><br />

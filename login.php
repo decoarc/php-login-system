@@ -54,17 +54,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <head>
     <meta charset="UTF-8" />
     <title>Login</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h2>Login</h2>
-    <?php if($message): ?>
-        <p><?php echo htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?> <a href='login.php'>Go back</a></p>
-    <?php endif; ?>
-    <form method="POST">
-      <input type="email" name="email" placeholder="E-mail" required /><br />
-      <input type="password" name="pass" placeholder="Password" required /><br />
-      <button type="submit">Log In</button>
-    </form>
-    <p>No account? <a href="register.php">Sign Up</a></p>
+    <div class="container">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Sign in</h2>
+          <p class="card-subtitle">Access your account</p>
+        </div>
+        <div class="card-body">
+          <?php if($message): ?>
+            <p class="feedback error"><?php echo htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p>
+          <?php endif; ?>
+          <form method="POST" class="form">
+            <input class="input" type="email" name="email" placeholder="E-mail" required />
+            <input class="input" type="password" name="pass" placeholder="Password" required />
+            <div class="actions">
+              <button class="button" type="submit">Log In</button>
+              <p class="helper">No account? <a class="link" href="register.php">Sign Up</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

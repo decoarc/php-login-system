@@ -32,50 +32,44 @@ $result = $conn->query($sql);
     <head>
         <meta charset="UTF-8">
         <title>All Users</title>
-        <style>
-            table {
-                border-collapse: collapse;
-                width: 50%;
-            }
-            th, td{
-                border: 1px solid #333;
-                padding: 8px;
-                text-align: left;
-            }
-            th {
-                background-color: #ddd;
-            }
-        </style>
+        <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-        <h2>Users List</h2>
-        <?php
-        if ($result && $result->num_rows > 0) {
-            echo "<table>";
-            echo "<tr><th>ID</th><th>User</th><th>E-mail</th><th>Actions</th></tr>";
-            while ($row = $result->fetch_assoc()){
-                $idEsc = (int)$row["id"];
-                $userEsc = htmlspecialchars($row["user"], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-                $emailEsc = htmlspecialchars($row["email"], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-                echo "<tr>";
-                echo "<td>" . $idEsc . "</td>";
-                echo "<td>" . $userEsc . "</td>";
-                echo "<td>" . $emailEsc . "</td>";
-                echo "<td>
-                        <form action='del_user.php' method='POST' onsubmit=\"return confirm('Are you sure?');\">
-                        <input type='hidden' name='id' value='" . $idEsc . "'>
-                        <input type='hidden' name='csrf_token' value='" . htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "'>
-                        <button type='submit'>Delete</button>
-                        </form>
-                      </td>";
-                echo "</tr>";
+        <div class="container">
+          <div class="table-wrap">
+            <h2 class="page-header">Users</h2>
+            <?php
+            if ($result && $result->num_rows > 0) {
+                echo "<table class=\"table\">";
+                echo "<thead><tr><th>ID</th><th>User</th><th>E-mail</th><th class=\"action-cell\">Actions</th></tr></thead><tbody>";
+                while ($row = $result->fetch_assoc()){
+                    $idEsc = (int)$row["id"];
+                    $userEsc = htmlspecialchars($row["user"], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                    $emailEsc = htmlspecialchars($row["email"], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                    echo "<tr>";
+                    echo "<td>" . $idEsc . "</td>";
+                    echo "<td>" . $userEsc . "</td>";
+                    echo "<td>" . $emailEsc . "</td>";
+                    echo "<td>
+                            <form action='del_user.php' method='POST' onsubmit=\"return confirm('Are you sure?');\" style=\"display:inline\">
+                            <input type='hidden' name='id' value='" . $idEsc . "'>
+                            <input type='hidden' name='csrf_token' value='" . htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "'>
+                            <button class='button danger' type='submit'>Delete</button>
+                            </form>
+                          </td>";
+                    echo "</tr>";
+                }
+                echo "</tbody></table>";
+            } else {
+                echo "<p class=\"helper\">No user registered.</p>";
             }
-            echo "</table>";
-        } else {
-            echo "No User registed";
-        }
 
-        $conn->close();
-        ?>
+            $conn->close();
+            ?>
+            <div class="nav">
+              <a class="link" href="dashboard.php">Back to dashboard</a>
+            </div>
+          </div>
+        </div>
     </body>
 </html>

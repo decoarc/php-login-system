@@ -53,19 +53,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <head>
     <meta charset="UTF-8" />
     <title>Register the User</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h2>Register</h2>
-    <form id="registerForm" method="post">
-      <input type="text" name="user" placeholder="User" required /><br />
-      <input type="email" id="email" name="email" placeholder="E-mail" required />
-      <span id="emailMsg"></span><br />
-      <input type="password" id="pass" name="pass" placeholder="Password" required />
-      <button type="button" id="togglePass" name="togglePass">👁️</button><br />
-      <button type="submit">Register</button>
-      <p id="formMsg"></p>
-      <p>want to go back? <a href="login.php">Login</a></p>
-    </form>
+    <div class="container">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Create account</h2>
+          <p class="card-subtitle">Start using the app</p>
+        </div>
+        <div class="card-body">
+          <form id="registerForm" method="post" class="form">
+            <input class="input" type="text" name="user" placeholder="User" required />
+            <div>
+              <input class="input" type="email" id="email" name="email" placeholder="E-mail" required />
+              <span id="emailMsg" class="helper"></span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;">
+              <input class="input" type="password" id="pass" name="pass" placeholder="Password" required />
+              <button type="button" id="togglePass" name="togglePass" class="button secondary" style="padding: 10px 12px;">👁️</button>
+            </div>
+            <div class="actions">
+              <button type="submit" class="button">Register</button>
+              <p id="formMsg" class="helper"></p>
+              <p class="helper">Want to go back? <a class="link" href="login.php">Login</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </body>
 
   <script>
@@ -100,18 +116,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .then((data) => {
           if (data.status === "ok" && data.available === false) {
             msgSpan.textContent = " E-mail not available.";
-            msgSpan.style.color = "red";
+            msgSpan.style.color = "#fca5a5";
           } else if (data.status === "ok" && data.available === true) {
             msgSpan.textContent = " E-mail available.";
-            msgSpan.style.color = "green";
+            msgSpan.style.color = "#86efac";
           } else {
             msgSpan.textContent = " Could not check e-mail.";
-            msgSpan.style.color = "orange";
+            msgSpan.style.color = "#fde68a";
           }
         })
         .catch(() => {
           msgSpan.textContent = " Could not check e-mail.";
-          msgSpan.style.color = "orange";
+          msgSpan.style.color = "#fde68a";
         });
     });
 
@@ -130,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           .then((data) => {
             const msg = document.getElementById("formMsg");
             msg.textContent = data.message;
-            msg.style.color = data.status === "success" ? "green" : "red";
+            msg.className = 'feedback ' + (data.status === 'success' ? 'success' : 'error');
           })
           .catch((error) => console.error("Erro:", error));
       });

@@ -1,38 +1,44 @@
 <?php
 session_start();
 
+// read the .env file
 $config = parse_ini_file(__DIR__ . '/.env');
-
+// get the values to connect to the database
 $host = $config['DB_HOST'];
 $user = $config['DB_USER'];
 $pass = $config['DB_PASS'];
 $db   = $config['DB_NAME'];
 
+// connect to the database
 $conn = new mysqli($host, $user, $pass, $db);
 
+// if the connection fails, die
 if ($conn->connect_error){
-    die("Connect Error: " . $conn->connect_error);
+    die("Connect Error");
 }
 
+// initialize the message variable
 $message = "";
 
+// if the request method is post
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'];
-    $pass = $_POST['pass'];
+    $email = $_POST['email']; // get the email from the post request
+    $pass = $_POST['pass']; // get the password from the post request
 
-    $sql = "SELECT id, user, pass FROM users WHERE email=?";
+    // prepare the sql statement
+    $sql = "SELECT id, user, pass FROM users WHERE email=?"; 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
 
+
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
-
-        if(password_verify($pass, $user['pass'])){
+        if(password_verify($pass, $user['pass'])){ // verify the password (the password from the post request and the password from the database)
             session_regenerate_id(true);
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['user'];
+            $_SESSION['user_id'] = $user['id']; 
+            $_SESSION['user_name'] = $user['user']; 
             $stmt->close();
             $conn->close();
             header('Location: dashboard.php');
@@ -65,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="card-body">
           <?php if($message): ?>
-            <p class="feedback error"><?php echo htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p>
+            <p class="feedback error"><?php echo htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p> 
           <?php endif; ?>
           <form method="POST" class="form">
             <input class="input" type="email" name="email" placeholder="E-mail" required />

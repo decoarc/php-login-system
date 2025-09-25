@@ -1,40 +1,47 @@
 <?php
 
+// read the .env file
 $config = parse_ini_file(__DIR__ . '/.env');
+// get the values to connect to the database
 
 $host = $config['DB_HOST'];
 $user = $config['DB_USER'];
 $pass = $config['DB_PASS'];
 $db   = $config['DB_NAME'];
 
+// connect to the database
 $conn = new mysqli($host, $user, $pass, $db);
 
-if ($conn->connect_error){
-    die("Connect Error: " . $conn->connect_error);
+if ($conn->connect_error){ // if the connection fails, die
+    die("Connect Error");
 }
 
 
+// initialize the response variable
 $response = ["status" => "", "message" => ""];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user = $_POST['user'];
-    $email = $_POST['email'];
-    $pass = password_hash($_POST['pass'], PASSWORD_DEFAULT);
+    $user = $_POST['user']; // get the user from the post request
+    $email = $_POST['email']; // get the email from the post request
+    $pass = password_hash($_POST['pass'], PASSWORD_DEFAULT); // hash the password
 
     $check = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $check->bind_param("s", $email);
     $check->execute();
     $check->store_result();
 
-    if ($check->num_rows > 0){
-        $response = ["status" => "error", "message" => "E-mail not available"];
-    } else {
-        $sql = $conn->prepare("INSERT INTO users (user, email, pass) VALUES (?, ?, ?)");
-        $sql->bind_param("sss", $user, $email, $pass);
+    // check if the email is already in the database
 
-        if ($sql->execute()) {
+    if ($check->num_rows > 0){
+        $response = ["status" => "error", "message" => "E-mail not available"]; // if the email is already in the database, return an error
+    } else {
+        $sql = $conn->prepare("INSERT INTO users (user, email, pass) VALUES (?, ?, ?)"); // insert the user into the database
+        $sql->bind_param("sss", $user, $email, $pass);
+        
+
+        if ($sql->execute()) { // if the user is inserted into the database, return a success message
             $response = ["status" => "success", "message" => "New user successfully registered"];
-        } else {
+        } else { // if the user is not inserted into the database, return an error
             $response = ["status" => "error", "message" => "User can't be registered"];
         }
     }
@@ -87,37 +94,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script>
     const passInput = document.getElementById("pass");
     const togglePass = document.getElementById("togglePass");
-
+ // toggle the password visibility
     togglePass.addEventListener("click", () => {
-      if (passInput.type === "password") {
+      if (passInput.type === "password") { // if the password is hidden, show it
         passInput.type = "text";
         togglePass.textContent = "🙈";
-      } else {
+      } else { // if the password is shown, hide it
         passInput.type = "password";
         togglePass.textContent = "👁️";
       }
     });
 
-    document.getElementById("email").addEventListener("blur", function () {
+     // check if the email is already in the database
+    document.getElementById("email").addEventListener("blur", function () { 
       const email = this.value;
-      const msgSpan = document.getElementById("emailMsg");
+      const msgSpan = document.getElementById("emailMsg"); // get the email message span
 
+      // if the email is empty, return
       if (email.length === 0) {
         msgSpan.textContent = "";
         return;
       }
-
+      // fetch the email from the database
       fetch("check_email.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "email=" + encodeURIComponent(email),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }, // set the content type to application/x-www-form-urlencoded
+        body: "email=" + encodeURIComponent(email), // encode the email
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data.status === "ok" && data.available === false) {
+          if (data.status === "ok" && data.available === false) { // if the email is already in the database, return an error
             msgSpan.textContent = " E-mail not available.";
             msgSpan.style.color = "#fca5a5";
-          } else if (data.status === "ok" && data.available === true) {
+          } else if (data.status === "ok" && data.available === true) { // if the email is not in the database, return a success message
             msgSpan.textContent = " E-mail available.";
             msgSpan.style.color = "#86efac";
           } else {
@@ -138,15 +147,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         const formData = new FormData(this);
 
-        fetch("", {
+        fetch("", { // send the form data to the server
           method: "POST",
           body: formData,
         })
           .then((response) => response.json())
           .then((data) => {
-            const msg = document.getElementById("formMsg");
+            const msg = document.getElementById("formMsg"); // get the form message span
             msg.textContent = data.message;
-            msg.className = 'feedback ' + (data.status === 'success' ? 'success' : 'error');
+            msg.className = 'feedback ' + (data.status === 'success' ? 'success' : 'error'); // set the class name to feedback success or error
           })
           .catch((error) => console.error("Erro:", error));
       });
